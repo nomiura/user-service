@@ -1,7 +1,6 @@
 package ru.test;
 
-import ru.test.config.HibernateUtil;
-import service.UserService;
+import ru.test.service.UserService;
 
 import java.util.Scanner;
 

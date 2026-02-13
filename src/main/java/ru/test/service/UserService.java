@@ -1,4 +1,4 @@
-package service;
+package ru.test.service;
 import ru.test.dao.UserDao;
 import ru.test.dao.UserDaoImpl;
 import ru.test.model.User;
