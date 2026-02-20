@@ -1,12 +1,19 @@
 package ru.test;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import ru.test.config.HibernateUtil;
+import ru.test.dao.UserDao;
+import ru.test.dao.UserDaoImpl;
 import ru.test.service.UserService;
 
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        UserService service = new UserService();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        UserDao userDao = new UserDaoImpl(sessionFactory);
+        UserService service = new UserService(userDao);
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Введите номер операции:");

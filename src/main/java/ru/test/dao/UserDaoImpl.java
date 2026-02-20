@@ -1,5 +1,6 @@
 package ru.test.dao;
 
+import org.hibernate.SessionFactory;
 import ru.test.config.HibernateUtil;
 import ru.test.model.User;
 import org.hibernate.Session;
@@ -7,6 +8,11 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 public class UserDaoImpl implements UserDao {
+    private final SessionFactory sessionFactory;
+
+    public UserDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     public void save(User user) {
@@ -15,14 +21,14 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User findById(Long id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.get(User.class, id);
         }
     }
 
     @Override
     public List<User> findAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery("from User", User.class).list();
         }
     }
@@ -42,7 +48,7 @@ public class UserDaoImpl implements UserDao {
 
     private void executeInsideTransaction(HibernateOperation operation) {
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             operation.execute(session);
             tx.commit();
@@ -54,7 +60,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User findByEmail(String email) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM User WHERE email = :email", User.class)
                     .setParameter("email", email)
                     .uniqueResult();
@@ -64,5 +70,10 @@ public class UserDaoImpl implements UserDao {
     @FunctionalInterface
     private interface HibernateOperation {
         void execute(Session session);
+    }
+
+    @Override
+    public void deleteAll() {
+        executeInsideTransaction(session -> session.createQuery("delete from User").executeUpdate());
     }
 }
